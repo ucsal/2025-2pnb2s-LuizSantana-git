@@ -2,22 +2,16 @@ package br.com.mariojp.solid.srp;
 
 public class ReceiptService {
 
-    private final TaxCalculator taxCalculator;
     private final ReceiptFormatter formatter;
+    private final OrderMathHandler orderMathHandler;
 
     public ReceiptService() {
-        this.taxCalculator = new TaxCalculator();
+        this.orderMathHandler = new OrderMathHandler();
         this.formatter = new ReceiptFormatter();
     }
 
     public String generate(Order order) {
-        double subtotal = 0.0;
-        for (var item : order.getItems()) {
-            subtotal += item.getUnitPrice() * item.getQuantity();
-        }
-        double tax = taxCalculator.calculateTax(subtotal); // lança se tax.rate faltar ou inválido
-        double total = subtotal + tax;
-
-        return formatter.montarTextoRecibo(order, subtotal, tax, total);
+       orderMathHandler.calculateAll(order);
+       return formatter.montarTextoRecibo(order, orderMathHandler.getSubtotal(),orderMathHandler.getTax(), orderMathHandler.getTotal());
     }
 }
